@@ -20,6 +20,8 @@ public:
 	}
 
 	void Update() {
+		mEngine.Render(King::Engine::TEXTURE_BACKGROUND, 22.5f, 0.f);
+
 		mEngine.Render(King::Engine::TEXTURE_GREEN, 650.0f, 100.0f);
 		mEngine.Render(King::Engine::TEXTURE_RED, 100.0f, 450.0f);
 		mEngine.Render(King::Engine::TEXTURE_BLUE, 650.0f, 450.0f);
