@@ -13,6 +13,7 @@ public:
 		, mRotation(0.0f)
 		, mYellowDiamondX(100.0f)
 		, mYellowDiamondY(100.0f) {
+		GenerateGrid();
 	}
 
 	void Start() {
@@ -22,25 +23,53 @@ public:
 	void Update() {
 		mEngine.Render(King::Engine::TEXTURE_BACKGROUND, 22.5f, 0.f);
 
-		mEngine.Render(King::Engine::TEXTURE_GREEN, 650.0f, 100.0f);
-		mEngine.Render(King::Engine::TEXTURE_RED, 100.0f, 450.0f);
-		mEngine.Render(King::Engine::TEXTURE_BLUE, 650.0f, 450.0f);
-
-		mEngine.Write("Green", 650.0f, 140.0f);
-		mEngine.Write("Red", 100.0f, 490.0f);
-		mEngine.Write("Blue", 650.0f, 490.0f);
-
-		const char text[] = "This rotates at 5/PI Hz";
-		mRotation += mEngine.GetLastFrameSeconds();
-		mEngine.Write(text, mEngine.GetWidth() / 2.0f, mEngine.GetHeight() / 2.0f, mRotation * 2.5f);
-
 		if (mEngine.GetMouseButtonDown()) {
 			mYellowDiamondX = mEngine.GetMouseX();
 			mYellowDiamondY = mEngine.GetMouseY();
 		}
 		mEngine.Render(King::Engine::TEXTURE_YELLOW, mYellowDiamondX, mYellowDiamondY);
-		mEngine.Write("Click to", mYellowDiamondX, mYellowDiamondY + 40.0f);
-		mEngine.Write("move me!", mYellowDiamondX, mYellowDiamondY + 70.0f);
+
+		for (int i = 0; i < 64; ++i)
+		{
+			float x = 350 + (static_cast<float>(i % 8) * 43.f);
+			float y = 100 + (static_cast<float>(i / 8) * 43.f);
+			mEngine.Render(mGrid[i], x, y);
+		}
+
+		char buffer[1000];
+		sprintf_s(buffer, "(%.0f, %.0f)", mYellowDiamondX, mYellowDiamondY);
+
+		mEngine.Write(buffer, mYellowDiamondX, mYellowDiamondY + 40.0f);
+	}
+
+	void GenerateGrid()
+	{
+		for (int i = 0; i < 64; ++i)
+		{
+			auto jewel = static_cast<King::Engine::Texture>((rand() % 5) + 1);
+			if (i > 1)
+			{
+				if (mGrid[i - 1] == jewel && mGrid[i - 2] == jewel)
+				{
+					jewel = static_cast<King::Engine::Texture>(jewel + 1);
+				}
+			}
+
+			if (i > 15)
+			{
+				if (mGrid[i - 8] == jewel && mGrid[i - 16] == jewel)
+				{
+					jewel = static_cast<King::Engine::Texture>(jewel + 1);
+				}
+			}
+
+			if (jewel == King::Engine::TEXTURE_MAX)
+			{
+				jewel = King::Engine::TEXTURE_BLUE;
+			}
+
+			mGrid[i] = jewel;
+		}
 	}
 
 private:
@@ -48,6 +77,7 @@ private:
 	float mRotation;
 	float mYellowDiamondX;
 	float mYellowDiamondY;
+	King::Engine::Texture mGrid[64];
 };
 
 //**********************************************************************
